@@ -1,6 +1,7 @@
 # artem198315_microservices
 artem198315 microservices repository
 
+[![Build Status](https://travis-ci.com/otus-devops-2019-02/artem198315_microservices.svg?branch=master)](https://travis-ci.com/otus-devops-2019-02/artem198315_microservices)
 
 # Домашнее задание 14
 
