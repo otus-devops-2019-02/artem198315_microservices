@@ -126,3 +126,72 @@ infra/packer/docker.json
 ```
 packer build -var ssh_username=appuser -var project_id=docker-239418 packer/docker.json
 ```
+
+# Домашнее задание 16
+
+Разбиение приложения на несколько микросервисов. Выбор базового образа. Подключение volume к контейнеру.
+
+## Описание конфигурации
+
+Для проверки докерфайла использую линтер
+```
+docker run --rm -i hadolint/hadolint < Dockerfile
+```
+
+Созданы три Dockerfile на базе alpine:
+src/post-py/Dockerfile
+src/comment/Dockerfile
+src/ui/Dockerfile
+
+Для минимизации размера образов, использую alpine и multistage building.
+
+Данные о подключениях между контейнерами заданы через ENV переменные (объявлены и устанавливаются по умолчанию в докерфайлах)
+
+
+Билдим:
+```
+docker build -t artem198315/post:1.0 src/post-py
+...
+...
+```
+
+Для обеспечения persistancy данных в бд подключаю к контейнеру с mongodb volume redditdb
+Для запуска контейнеров
+
+```
+docker run -d --network=reddit \
+--network-alias=post_db --network-alias=comment_db -v redditdb:/data/db --name=mongo mongo:latest
+
+docker run -d --network=reddit \
+--network-alias=post --name=post artem198315/post:1.0
+
+docker run -d --network=reddit \
+--network-alias=comment --name=comment artem198315/comment:1.0
+
+docker run -d --network=reddit \
+-p 9292:9292 --name=ui artem198315/ui:1.0
+```
+
+Или если нужно поменять значения кто куда подключается, можно установить изменить --network-alias(или прописать --name ) и явно задать переменные окружения:
+```
+docker run -d --network=reddit \
+--network-alias=mongo_db -v redditdb:/data/db --name=mongo mongo:latest
+
+docker run -d --network=reddit \
+--network-alias=post_app -e POST_DATABASE_HOST=mongo_db --name=post artem198315/post:1.0
+
+docker run -d --network=reddit \
+--network-alias=comment_app -e COMMENT_DATABASE_HOST=mongo_db --name=comment artem198315/comment:1.0
+
+docker run -d --network=reddit \
+-p 9292:9292 -e POST_SERVICE_HOST=post_app -e COMMENT_SERVICE_HOST=comment_app --name=ui artem198315/ui:1.0
+```
+
+
+
+
+
+
+
+
+
