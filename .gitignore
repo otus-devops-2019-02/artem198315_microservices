@@ -1,0 +1,21 @@
+variables.json
+validate.*
+*.tfstate
+*.tfstate.*.backup
+*.tfstate.backup
+*.tfvars
+.terraform/
+*.retry
+
+docker
+
+# Vagrant & molecule
+.vagrant/
+*.log
+*.pyc
+.molecule
+.cache
+.pytest_cache
+
+virtualenv
+

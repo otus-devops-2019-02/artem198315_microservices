@@ -1,0 +1,22 @@
+---
+- name: deploy reddit-app
+  hosts: gcp_items__u_docker__
+  become: true
+
+  tasks:
+    - name: install deps
+      pip:
+        name: docker-py
+        state: present
+      tags: deploy
+
+    - name: run container with reddit-app
+      docker_container:
+        name: reddit-app
+        image: artem198315/otus-reddit:1.0
+        state: started
+        restart: yes
+        pull: yes
+        network_mode: host
+      tags: deploy
+
