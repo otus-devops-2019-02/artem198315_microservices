@@ -128,6 +128,7 @@ infra/packer/docker.json
 packer build -var ssh_username=appuser -var project_id=docker-239418 packer/docker.json
 ```
 
+
 # Домашнее задание 16
 
 Разбиение приложения на несколько микросервисов. Выбор базового образа. Подключение volume к контейнеру.
@@ -188,12 +189,4 @@ docker run -d --network=reddit \
 docker run -d --network=reddit \
 -p 9292:9292 -e POST_SERVICE_HOST=post_app -e COMMENT_SERVICE_HOST=comment_app --name=ui artem198315/ui:1.0
 ```
-
-
-
-
-
-
-
-
 
