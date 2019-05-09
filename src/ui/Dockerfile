@@ -1,20 +1,12 @@
-FROM ruby:2.2-alpine as base
-
-FROM base as builder
+FROM ruby:2.2-alpine
 
 RUN apk update && apk --no-cache add make gcc libc-dev
-
-ENV BUILD_HOME /app
-RUN mkdir $BUILD_HOME
-WORKDIR $BUILD_HOME
-COPY Gemfile* $BUILD_HOME/
-RUN bundle install --clean --no-cache
-
-FROM base
 
 ENV APP_HOME /app
 RUN mkdir $APP_HOME
 WORKDIR $APP_HOME
+COPY Gemfile* $APP_HOME/
+RUN bundle install --clean --no-cache
 
 COPY --from=builder /usr/local/bundle  /usr/local/bundle
 COPY . $APP_HOME
