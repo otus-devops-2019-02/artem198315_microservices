@@ -8,7 +8,6 @@ WORKDIR $APP_HOME
 COPY Gemfile* $APP_HOME/
 RUN bundle install --clean --no-cache
 
-COPY --from=builder /usr/local/bundle  /usr/local/bundle
 COPY . $APP_HOME
 
 ENV POST_SERVICE_HOST post
