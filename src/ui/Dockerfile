@@ -4,8 +4,10 @@ FROM base as builder
 
 RUN apk update && apk --no-cache add make gcc libc-dev
 
-WORKDIR /
-COPY Gemfile* /
+ENV BUILD_HOME /app
+RUN mkdir $BUILD_HOME
+WORKDIR $BUILD_HOME
+COPY Gemfile* $BUILD_HOME/
 RUN bundle install --clean --no-cache
 
 FROM base
