@@ -197,6 +197,8 @@ docker run -d --network=reddit \
 
 ## Описание конфигурации
 
+Поднимаем микросервисы из HW16 через docker-compose.
+
 docker-compose.yml параметризирован.
 Переменные читаются из .env
 
@@ -205,7 +207,7 @@ docker-compose.yml параметризирован.
 - прописать COMPOSE_PROJECT_NAME=name в .env файл.
 - использовать флаг -p
 
-docker-compose.ovveride.yml
+docker-compose.override.yml
 Переопределяет запуск puma для руби в дебаг режиме с двумя воркерами, через command
 ```
 version: '3.3'
