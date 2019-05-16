@@ -190,3 +190,37 @@ docker run -d --network=reddit \
 -p 9292:9292 -e POST_SERVICE_HOST=post_app -e COMMENT_SERVICE_HOST=comment_app --name=ui artem198315/ui:1.0
 ```
 
+
+# Домашнее задание 17
+
+Практика работы с основными типами Docker сетей. Декларативное описание Docker инфраструктуры при помощи Docker Compose.
+
+## Описание конфигурации
+
+docker-compose.yml параметризирован.
+Переменные читаются из .env
+
+Задать имя проекта:
+- export COMPOSE_PROJECT_NAME=name
+- прописать COMPOSE_PROJECT_NAME=name в .env файл.
+- использовать флаг -p
+
+docker-compose.ovveride.yml
+Переопределяет запуск puma для руби в дебаг режиме с двумя воркерами, через command
+```
+version: '3.3'
+services:
+  ui:
+    command: ["puma","--debug","-w","2"]
+  comment:
+    command: ["puma","--debug","-w","2"]
+```
+
+
+При желании можно примонтировать к контейнерам директорию с приложением (через volume),
+если есть необходимость обновлять код приложений, не пересобирая образ
+
+
+
+
+
