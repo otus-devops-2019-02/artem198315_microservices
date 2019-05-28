@@ -1,0 +1,6 @@
+- name: reload_docker
+  service: name=docker state=restarted daemon_reload=yes
+  register: restart_status
+  until: restart_status is success
+  delay: 5
+  #shell: systemctl daemon-reload && systemctl stop docker && systemctl start docker && systemctl enable docker

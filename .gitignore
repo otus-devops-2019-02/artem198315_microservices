@@ -7,8 +7,6 @@ validate.*
 .terraform/
 *.retry
 
-docker
-
 # Vagrant & molecule
 .vagrant/
 *.log

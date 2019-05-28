@@ -1,0 +1,63 @@
+---
+version: '3.3'
+services:
+  post_db:
+    image: mongo:${MONGO_VERSION}
+    volumes:
+      - post_db:/data/db
+    networks:
+      - reddit_back
+  ui:
+    image: ${USERNAME}/ui:${UI_VERSION}
+    ports:
+      - ${UI_PORT}:9292/tcp
+    networks:
+      - reddit_front
+      - reddit_back
+  post:
+    image: ${USERNAME}/post:${POST_VERSION}
+    networks:
+      - reddit_front
+      - reddit_back
+  comment:
+    image: ${USERNAME}/comment:${COMMENT_VERSION}
+    networks:
+      - reddit_front
+      - reddit_back
+  prometheus:
+    image: ${USERNAME}/prometheus
+    ports:
+      - '9090:9090'
+    volumes:
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention=1d'
+    networks:
+      - reddit_front
+      - reddit_back
+  node-exporter:
+    image: prom/node-exporter:v0.15.2
+    user: root
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.ignored-mount-points="^/(sys|proc|dev|host|etc)($$|/)"'
+    networks:
+      - reddit_back
+
+volumes:
+  post_db:
+  prometheus_data:
+
+networks:
+  reddit_front:
+    driver: bridge
+  reddit_back:
+    driver: bridge
+
