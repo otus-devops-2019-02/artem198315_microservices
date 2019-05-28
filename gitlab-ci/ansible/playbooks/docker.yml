@@ -1,0 +1,7 @@
+---
+- name: Configure application
+  hosts: gcp_items__u_gitlab__
+  become: true
+
+  roles:
+    - docker
