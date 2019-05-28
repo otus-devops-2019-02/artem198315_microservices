@@ -1,9 +1,0 @@
-plugin: gcp_compute
-projects:
-  - docker-239418
-filters:
-auth_kind: serviceaccount
-service_account_file: /home/shinta/gce/docker.json
-keyed_groups:
-  - prefix: gcp
-    key: tags
