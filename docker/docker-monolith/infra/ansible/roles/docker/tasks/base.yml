@@ -1,0 +1,24 @@
+---
+- name: INFO MESSAGE FOR DOCKERHOST PLAYBOOK
+  debug:
+    msg: "USE --tags=install' for installing and reload, --tags=config for rollout configs without reload, --tags=reload for reload"
+
+- name: create directory for ansible custom facts
+  file:
+    state: "directory"
+    recurse: yes
+    path: "/etc/ansible/facts.d"
+
+- name: install custom impi fact
+  copy:
+    src: files/docker.fact
+    dest: /etc/ansible/facts.d
+    mode: 0755
+
+- name: re-read facts after adding custom fact
+  setup: ~
+
+- name: Check what docker version installed
+  debug:
+    msg: "Docker: {{ ansible_local.docker }}"
+

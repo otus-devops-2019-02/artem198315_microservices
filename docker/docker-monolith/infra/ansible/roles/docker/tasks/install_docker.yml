@@ -1,0 +1,16 @@
+---
+- name: install docker compose
+  get_url:
+    url:  https://github.com/docker/compose/releases/download/{{ compose_version }}/docker-compose-Linux-x86_64
+    dest: /usr/bin/docker-compose
+    mode: 0755
+
+- name: install docker with yum
+  include_tasks: install_docker_yum.yml
+  when: ansible_distribution | lower == "centos"
+
+- name: install docker with apt
+  include_tasks: install_docker_apt.yml
+  with_items:
+    - ubuntu
+  when: ansible_distribution | lower == "{{ item }}"

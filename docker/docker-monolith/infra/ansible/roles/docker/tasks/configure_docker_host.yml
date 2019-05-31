@@ -1,0 +1,45 @@
+- name: sysctl
+  sysctl: name=vm.max_map_count value=262144 state=present
+  notify: reload_docker
+
+- name: sysctl
+  sysctl: name=fs.file-max value=65500 state=present
+  notify: reload_docker
+
+- name: ulimit
+  template:
+    src: limits.j2
+    dest: /etc/security/limits.d/5-nofile.conf
+    owner: root
+    group: root
+    mode: "u=rw,g=,o="
+
+- name: create directory for docker configs
+  file:
+    state: "directory"
+    recurse: yes
+    path: "/etc/docker"
+
+- name: create directory for systemd overide
+  file:
+    state: directory
+    recurse: yes
+    path: "/etc/systemd/system/docker.service.d"
+
+- name: template daemon.json upload
+  template:
+    src: docker/configs/daemon.json.tpl
+    dest: /etc/docker/daemon.json
+    owner: root
+    group: root
+    mode: "u=rw,g=,o="
+  notify: reload_docker
+
+- name: template systemd overide docker service
+  template:
+    src: docker/systemd/docker.conf
+    dest: /etc/systemd/system/docker.service.d/docker.conf
+    owner: root
+    group: root
+    mode: "u=rw,g=r,o=r"
+

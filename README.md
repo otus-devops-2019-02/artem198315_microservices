@@ -235,6 +235,59 @@ Gitlab CI. Построение процесса непрерывной инте
 Протестированы возможности по созданию pipeline средствами gitlab-ci
 
 
+# Домашнее задание 20
+
+Создание и запуск системы мониторинга Prometheus.
+Мониторинг состояния микросервисов, сбор метрик при помощи prometheus exporters.
+
+## Описание конфигурации
+
+Создаем хост в GCE
+export GOOGLE_PROJECT=docker-239418
+
+docker-machine create --driver google \
+ --google-machine-image https://www.googleapis.com/compute/v1/projects/ubuntu-os-cloud/global/images/family/ubuntu-1604-lts \
+ --google-machine-type n1-standard-1 \
+ --google-zone europe-west1-b \
+ docker-host
+
+
+Создаем файл настроек prometheus.yml
+Создаем Dockerfile и прокидываем в нем prometheus.yml в /etc/prometheus/prometheus.yml
+```
+FROM prom/prometheus:v2.1.0
+ADD prometheus.yml /etc/prometheus/
+```
+
+Добавляем в docker-compose сервис prometheus
+```
+prometheus:
+    image: ${USERNAME}/prometheus
+    ports:
+      - '9090:9090'
+    volumes:
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention=1d'
+    networks:
+      - reddit_front
+      - reddit_back
+
+volumes:
+  post_db:
+  prometheus_data:
+```
+
+Билдим образы приложения из директории src/
+Используем для этого файлы docker_build.sh
+Перед этим экспортируем переменную export USER_NAME=artem198315 
+
+Образы запушены на docker hub (https://cloud.docker.com/repository/list)
+
+Поднимаем стек:
+USERNAME=artem198315 docker-compose up -d
 
 
 

@@ -1,0 +1,20 @@
+---
+- name: import base.yml
+  import_tasks: base.yml
+  tags: always
+
+- name: install docker and docker compose
+  import_tasks: install_docker.yml
+  tags: [ 'never', 'install' ]
+
+- name: configure docker host
+  import_tasks: configure_docker_host.yml
+  tags: [ 'never', 'config', 'install' ]
+
+- name: reloading service
+  debug: msg="Force reloading docker"
+  changed_when: True
+  notify: reload_docker
+  tags: ['never', 'reload']
+
+
