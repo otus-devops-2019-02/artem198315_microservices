@@ -1,0 +1,44 @@
+---
+- name: all hosts configuration
+  hosts: gcp_items__u_controllers__
+  become: yes
+  gather_facts: True
+
+  tasks:
+    - name: copy controller certs
+      copy:
+        src: ../../certs/certs/kubernetes-key.pem
+        dest: /root/kubernetes-key.pem
+    - name: copy controller certs
+      copy:
+        src: ../../certs/certs/kubernetes.pem
+        dest: /root/kubernetes.pem
+    - name: copy controller certs
+      copy:
+        src: ../../certs/certs/ca.pem
+        dest: /root/ca.pem
+    - name: copy controller certs
+      copy:
+        src: ../../certs/certs/ca-key.pem
+        dest: /root/ca-key.pem
+
+    - name: copy controller configs
+      copy:
+        src: ../../certs/configs/admin.kubeconfig
+        dest: /root/admin.kubeconfig
+    - name: copy controller configs
+      copy:
+        src: ../../certs/configs/kube-controller-manager.kubeconfig
+        dest: /root/kube-controller-manager.kubeconfig
+    - name: copy controller configs
+      copy:
+        src: ../../certs/configs/kube-scheduler.kubeconfig
+        dest: /root/kube-scheduler.kubeconfig
+    - name: copy encryption config
+      copy:
+        src: ../../certs/configs/encryption-config.yaml
+        dest: /root/encryption-config.yaml
+
+  
+
+

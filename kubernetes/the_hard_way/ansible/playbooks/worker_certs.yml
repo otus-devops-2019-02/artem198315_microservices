@@ -1,0 +1,29 @@
+---
+- name: all hosts configuration
+  hosts: gcp_items__u_workers__
+  become: yes
+  gather_facts: True
+
+  tasks:
+    - name: copy workers certs
+      copy:
+        src: ../../certs/certs/{{ansible_hostname}}-key.pem
+        dest: /root/{{ansible_hostname}}-key.pem
+    - name: copy workers certs
+      copy:
+        src: ../../certs/certs/{{ansible_hostname}}.pem
+        dest: /root/{{ansible_hostname}}.pem
+    - name: copy workers certs
+      copy:
+        src: ../../certs/certs/ca.pem
+        dest: /root/ca.pem
+    - name: copy workers configs
+      copy:
+        src: ../../certs/configs/{{ansible_hostname}}.kubeconfig
+        dest: /root/{{ansible_hostname}}.kubeconfig
+    - name: copy workers configs
+      copy:
+        src: ../../certs/configs/kube-proxy.kubeconfig
+        dest: /root/kube-proxy.kubeconfig
+
+

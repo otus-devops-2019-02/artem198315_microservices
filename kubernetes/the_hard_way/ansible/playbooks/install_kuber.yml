@@ -1,0 +1,71 @@
+---
+- name: all hosts configuration
+  hosts: gcp_items__u_controllers__
+  become: yes
+  gather_facts: True
+
+  tasks:
+  - name: download kube-apiserver
+    get_url:
+      url: "{{ item }}" 
+      dest: /usr/local/bin/
+    with_items:
+      - https://storage.googleapis.com/kubernetes-release/release/v1.12.0/bin/linux/amd64/kube-apiserver
+      - https://storage.googleapis.com/kubernetes-release/release/v1.12.0/bin/linux/amd64/kube-controller-manager
+      - https://storage.googleapis.com/kubernetes-release/release/v1.12.0/bin/linux/amd64/kube-scheduler
+      - https://storage.googleapis.com/kubernetes-release/release/v1.12.0/bin/linux/amd64/kubectl
+  - name: make ownership
+    file:
+      path: "/usr/local/bin/{{ item }}"
+      mode: "0755"
+    with_items:
+      - kube-apiserver
+      - kube-controller-manager
+      - kube-scheduler
+      - kubectl
+  - name: make dirs
+    file:
+      path: "{{ item }}"
+      state: directory
+    with_items:
+      - /etc/kubernetes/config
+      - /var/lib/kubernetes
+
+  - name: copy certs and configs
+    copy:
+      src: "{{ item }}"
+      dest: /var/lib/kubernetes/
+    with_items:
+      - ../../certs/certs/ca.pem
+      - ../../certs/certs/ca-key.pem
+      - ../../certs/certs/kubernetes-key.pem
+      - ../../certs/certs/kubernetes.pem
+      - ../../certs/certs/service-account-key.pem
+      - ../../certs/certs/service-account.pem
+      - ../../certs/configs/encryption-config.yaml
+      - ../../certs/configs/kube-controller-manager.kubeconfig
+      - ../../certs/configs/kube-scheduler.kubeconfig
+
+  - name: copy /etc/etc/kubernetes/config
+    template:
+      src: kube-scheduler.yaml.j2
+      dest: /etc/kubernetes/config/kube-scheduler.yaml
+
+  - name: copy systemd
+    template:
+      src: "{{ item }}.j2"
+      dest: "/etc/systemd/system/{{ item }}"
+    with_items:
+     - kube-apiserver.service
+     - kube-controller-manager.service
+     - kube-scheduler.service
+
+  - name: start kube services
+    service:
+      name: "{{ item }}"
+      enabled: yes
+      state: started
+    with_items:
+      - kube-apiserver
+      - kube-controller-manager
+      - kube-scheduler
