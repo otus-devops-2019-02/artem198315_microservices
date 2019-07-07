@@ -1,0 +1,34 @@
+---
+- name: all hosts configuration
+  hosts: gcp_items__u_controllers__
+  become: yes
+  gather_facts: True
+
+  tasks:
+    - name: install nginx
+      apt:
+        name: nginx
+        state: present
+    - name: service nginx
+      service:
+        name: nginx
+        state: started
+        enabled: yes
+    - name: copy nginx configs
+      template:
+        src: nginx.conf.j2
+        dest: /etc/nginx/sites-available/kubernetes.default.svc.cluster.local
+    - name: nginx availiable
+      file:
+        src: /etc/nginx/sites-available/kubernetes.default.svc.cluster.local
+        dest: /etc/nginx/sites-enabled/kubernetes.default.svc.cluster.local
+        state: link
+      notify:
+        - nginx reload
+
+  handlers:
+    - name: nginx reload
+      service:
+        name: nginx
+        state: reloaded
+ 

@@ -1,0 +1,20 @@
+---
+- name: all hosts configuration
+  hosts: gcp_items__u_controllers__
+  become: yes
+  gather_facts: True
+
+  tasks:
+    - name: copy rbacs template
+      template:
+        src: "{{ item }}.j2"
+        dest: "/root/{{ item }}"
+      with_items:
+        - kube_rbac.json
+        - kube_rbac2.json
+    - name: apply rback1
+      shell: kubectl apply --kubeconfig /root/admin.kubeconfig -f /root/kube_rbac.json
+    - name: apply rback2
+      shell: kubectl apply --kubeconfig /root/admin.kubeconfig -f /root/kube_rbac2.json
+
+ 

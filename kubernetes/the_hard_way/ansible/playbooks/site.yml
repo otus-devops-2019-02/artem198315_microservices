@@ -1,0 +1,10 @@
+---
+- import_playbook: install_python.yml
+- import_playbook: worker_certs.yml
+- import_playbook: controller_certs.yml
+- import_playbook: install_etcd.yml
+- import_playbook: install_kuber.yml
+- import_playbook: install_nginx.yml
+- import_playbook: set_rbac.yml
+- import_playbook: install_worker.yml
+ 

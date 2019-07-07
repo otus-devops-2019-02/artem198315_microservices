@@ -1,0 +1,175 @@
+---
+- name: all hosts configuration
+  hosts: gcp_items__u_workers__
+  become: yes
+  gather_facts: True
+
+  tasks:
+    - name: set pod-cidr fast
+      set_fact:
+        pod_cidr: "{{ item.value }}"
+      with_items: "{{ metadata['items'] }}"
+      when: "'pod-cidr' in item.key"
+      tags: ["test"]
+    - name: install packeges
+      apt:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - socat
+        - conntrack
+        - ipset
+    - name: download kube
+      get_url:
+        url: "{{ item }}"
+        dest: /usr/local/bin/
+      with_items:
+        - https://storage.googleapis.com/kubernetes-release/release/v1.12.0/bin/linux/amd64/kubectl
+        - https://storage.googleapis.com/kubernetes-release/release/v1.12.0/bin/linux/amd64/kube-proxy
+        - https://storage.googleapis.com/kubernetes-release/release/v1.12.0/bin/linux/amd64/kubelet
+    - name: make ownership
+      file:
+        path: "/usr/local/bin/{{ item }}"
+        mode: "0755"
+      with_items:
+        - kube-proxy
+        - kubelet
+        - kubectl
+    - name: make dirs
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - /etc/cni/net.d
+        - /opt/cni/bin
+        - /var/lib/kubelet
+        - /var/lib/kube-proxy
+        - /var/lib/kubernetes
+        - /var/run/kubernetes
+        - /etc/containerd
+    - name: download others
+      get_url:
+        url: "{{ item }}"
+        dest: /tmp/
+      with_items:
+        - https://github.com/kubernetes-sigs/cri-tools/releases/download/v1.12.0/crictl-v1.12.0-linux-amd64.tar.gz
+        - https://storage.googleapis.com/kubernetes-the-hard-way/runsc-50c283b9f56bb7200938d9e207355f05f79f0d17
+        - https://github.com/opencontainers/runc/releases/download/v1.0.0-rc5/runc.amd64
+        - https://github.com/containernetworking/plugins/releases/download/v0.6.0/cni-plugins-amd64-v0.6.0.tgz
+        - https://github.com/containerd/containerd/releases/download/v1.2.0-rc.0/containerd-1.2.0-rc.0.linux-amd64.tar.gz
+    - name: extract one
+      unarchive:
+        src: "/tmp/{{ item }}"
+        dest: /opt/cni/bin/
+        remote_src: yes
+      with_items:
+        - cni-plugins-amd64-v0.6.0.tgz
+    - name: extract two
+      unarchive:
+        src: "/tmp/{{ item }}"
+        dest: /usr/local/bin/
+        remote_src: yes
+      with_items:
+        - crictl-v1.12.0-linux-amd64.tar.gz
+    - name: extract 3
+      unarchive:
+        src: "/tmp/{{ item }}"
+        dest: /
+        remote_src: yes
+      with_items:
+        - containerd-1.2.0-rc.0.linux-amd64.tar.gz
+    - name: move 1
+      copy:
+        src: /tmp/runsc-50c283b9f56bb7200938d9e207355f05f79f0d17
+        dest: /usr/local/bin/runsc
+        mode: "0755"
+        remote_src: true
+    - name: move 2
+      copy:
+        src: /tmp/runc.amd64
+        dest: /usr/local/bin/runc
+        mode: "0755"
+        remote_src: true
+    - name: make ownership
+      file:
+        path: "/usr/local/bin/{{ item }}"
+        mode: "0755"
+      with_items:
+        - kube-proxy 
+        - kubelet
+        - kubectl
+    - name: cni conf files
+      template:
+        src: "{{ item }}.j2"
+        dest: "/etc/cni/net.d/{{ item }}"
+      with_items:
+        - 10-bridge.conf
+        - 99-loopback.conf
+    - name: containerd conf
+      template:
+        src: containerd_config.toml.j2
+        dest: /etc/containerd/config.toml
+    - name: containerd systemd service
+      template:
+        src: containerd.service.j2
+        dest: /etc/systemd/system/containerd.service
+    - name: copy kubelet certs
+      copy:
+        src: "{{ item }}"
+        dest: "/var/lib/kubelet/"
+      with_items:
+        - "../../certs/certs/{{ ansible_hostname}}-key.pem"
+        - "../../certs/certs/{{ ansible_hostname}}.pem"
+        - ../../certs/certs/ca.pem
+    - name: copy ca cert
+      copy:
+        src: ../../certs/certs/ca.pem
+        dest: /var/lib/kubernetes/ca.pem
+    - name: copy kubelet configs
+      copy:
+        src: "../../certs/configs/{{ ansible_hostname}}.kubeconfig" 
+        dest: /var/lib/kubelet/kubeconfig
+    - name: copy kubelet-config config
+      template:
+        src: kubelet-config.yml.j2
+        dest: /var/lib/kubelet/kubelet-config.yaml
+    - name: kubelet systemd service file
+      template:
+        src: kubelet.service.j2
+        dest: /etc/systemd/system/kubelet.service
+
+    - name: copy kube-proxy configs
+      copy:
+        src: ../../certs/configs/kube-proxy.kubeconfig
+        dest: /var/lib/kube-proxy/kubeconfig
+      tags: ["kube-proxy"]
+    - name: copy kube-proxy-config 
+      template:
+        src: kube-proxy-config.yml.j2
+        dest: /var/lib/kube-proxy/kube-proxy-config.yaml
+      tags: ["kube-proxy"]
+    - name: kube-proxy systemd service file
+      template:
+        src: kube-proxy.service.j2
+        dest: /etc/systemd/system/kube-proxy.service
+      tags: ["kube-proxy"]
+
+
+    - name: start kube services
+      service:
+        name: "{{ item }}"
+        state: started
+        enabled: yes
+      with_items:
+        - containerd
+        - kubelet
+        - kube-proxy
+  
+
+    
+
+
+
+
+
+
