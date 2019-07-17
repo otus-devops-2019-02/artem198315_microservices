@@ -306,3 +306,20 @@ USERNAME=artem198315 docker-compose up -d
 - certs (скрипты для генерации конфигов и сертификатов для терраформ, директории для certs и configs)
 
 kube_remote.sh - настраивает remote access
+
+# Домашнее задание 26
+
+Установка и настройка Google Kubernetes Engine, настройка локального профиля администратора для GKE. Работа с с контроллерами: StatefulSet, Deployment, DaemonSet
+
+## Описание конфигурации
+
+Запущен локальный kubernetes cluster в minikube
+На нем оттестированы yaml манифесты для запуска приложения reddit и настройки RBAC.
+
+С помощью терраформа развернут кластер kubernetes в GCE (сам кластер и firewall rules для него).
+На него выкачено приложение reddit.
+
+None! Настройки для kubernetes dashboard в GCE не проводились т.к он depricated
+
+
+
