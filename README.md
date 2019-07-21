@@ -321,5 +321,33 @@ kube_remote.sh - настраивает remote access
 
 None! Настройки для kubernetes dashboard в GCE не проводились т.к он depricated
 
+# Домашнее задание 27
+
+Настройка балансировщиков нагрузки в Kubernetes и SSLTerminating.
+Подключение удаленных хранилищ GCP данных к POD’ам.
+
+## Описание конфигурации
+
+
+
+NetworkPolicy - инструмент для декларативного описания потоков трафика. Не все сетевые плагины поддерживают
+политики сети. В частности, у GKE эта функция пока в Beta-тесте и для её работы отдельно будет включен сетевой плагин Calico (вместо Kubenet). 
+
+Включаем:
+```
+gcloud beta container clusters update reddit-cluster --zone=europe-west3-c --update-addons=NetworkPolicy=ENABLED
+gcloud beta container clusters update reddit-cluster --zone=europe-west3-c --enable-network-policy
+```
+
+Настраиваем разрешения для доступа на Mongo только с сервисов comment и post (mongo-network-policy.yml)
+
+
+Мы можем использовать не целый выделенный диск для каждого пода, а целый ресурс хранилища, общий для всего кластера.
+Тогда при запуске Stateful-задач в кластере, мы сможем запросить хранилище в виде такого же ресурса, как CPU или оперативная память. Для этого будем использовать механизм PersistentVolume (mongo-volume.yml)
+
+Чтобы выделить приложению часть такого ресурса - нужно
+создать запрос на выдачу - PersistentVolumeClaim.
+
+
 
 
