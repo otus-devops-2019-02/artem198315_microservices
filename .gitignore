@@ -16,4 +16,5 @@ validate.*
 .pytest_cache
 
 virtualenv
-
+*.key
+*.crt
