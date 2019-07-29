@@ -18,3 +18,5 @@ validate.*
 virtualenv
 *.key
 *.crt
+
+Gitlab_ci

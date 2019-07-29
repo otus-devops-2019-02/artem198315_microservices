@@ -1,0 +1,10 @@
+---
+service:
+  internalPort: 9292
+  externalPort: 9292
+
+image:
+  repository: artem198315/comment
+  tag: latest
+
+databaseHost:

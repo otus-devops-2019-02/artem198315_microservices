@@ -357,5 +357,33 @@ gcloud beta container clusters update reddit-cluster --zone=europe-west3-c --ena
 Реализовано динамическое выделение PVC, используя storageClass
 
 
+# Домашнее задание 28
+
+Использование формата упаковки приложений Charts в Kubernetes Helm.
+
+## Описание конфигурации
 
 
+#заводим service account для tiller
+kubectl apply -f tiller.yml
+
+#helm init
+helm init --service-account tiller
+
+#Установить зависисмости
+helm dep install ./reddit
+
+#Установка
+helm install --name reddit-test ./reddit
+
+#обновить зависимости
+helm dep update ./reddit
+
+#Обновление
+helm upgrade reddit-test reddit/
+
+#добавить репо с чартами
+helm repo add gitlab https://charts.gitlab.io
+
+#Скачать чарт из репо в разархивированном виде
+helm fetch gitlab/gitlab-omnibus --version 0.1.37 --untar
