@@ -5,9 +5,9 @@ resource "google_container_cluster" "reddit-cluster" {
 
   node_config {
     preemptible  = true
-    machine_type = "n1-standard-1"
+    machine_type = "n1-standard-2"
 
-    disk_size_gb = "20"
+    disk_size_gb = "40"
 
     metadata = {
       disable-legacy-endpoints = "true"

@@ -1,0 +1,9 @@
+service:
+  internalPort: 5000
+  externalPort: 5000
+
+image:
+   repository: artem198315/post
+   tag: latest
+
+databaseHost:
